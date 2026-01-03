@@ -7,8 +7,9 @@ services:
       - db_password
     volumes:
       - db_data:/var/lib/postgresql
+      - ./db/scripts:/docker-entrypoint-initdb.d:ro
     environment:
-      - POSTGRES_DB=example_db
+      - POSTGRES_DB=surf-share
       - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
     expose:
       - 5432

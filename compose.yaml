@@ -1,4 +1,14 @@
 services:
+  app:
+    image: golang:1.25
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./app:/go/app:rw
+    command: tail -f /dev/null # TODO replace once server is implemented
+
   db:
     image: postgres:18
     restart: always

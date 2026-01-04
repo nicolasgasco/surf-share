@@ -6,19 +6,19 @@ import (
 	"net/http"
 	"surf-share/app/models"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type BreaksHandler struct {
-	conn *pgx.Conn
+	pool *pgxpool.Pool
 }
 
-func NewBreaksHandler(conn *pgx.Conn) *BreaksHandler {
-	return &BreaksHandler{conn: conn}
+func NewBreaksHandler(pool *pgxpool.Pool) *BreaksHandler {
+	return &BreaksHandler{pool: pool}
 }
 
 func (h *BreaksHandler) HandleBreaks(w http.ResponseWriter, _ *http.Request) {
-	rows, err := h.conn.Query(context.Background(), "SELECT id, name, slug FROM app.breaks")
+	rows, err := h.pool.Query(context.Background(), "SELECT id, name, slug FROM app.breaks")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

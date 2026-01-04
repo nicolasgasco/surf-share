@@ -9,6 +9,7 @@ echo "Installing pgx and dependencies..."
 go get github.com/jackc/pgx/v5
 go get github.com/jackc/pgx/v5/pgconn
 go get github.com/jackc/pgx/v5/pgtype
+go get github.com/jackc/pgx/v5/pgxpool
 
 echo "Tidying go modules..."
 go mod tidy

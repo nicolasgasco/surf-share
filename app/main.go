@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"surf-share/app/handlers"
 	"surf-share/app/middleware"
@@ -22,17 +22,17 @@ func main() {
 		os.Getenv("DB_NAME"),
 	)
 
-	conn, err := pgx.Connect(context.Background(), connStr)
+	pool, err := pgxpool.New(context.Background(), connStr)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
 		os.Exit(1)
 	}
-	defer conn.Close(context.Background())
+	defer pool.Close()
 
 	mux := http.NewServeMux()
 
 	// Breaks
-	mux.HandleFunc("GET /breaks", handlers.NewBreaksHandler(conn).HandleBreaks)
+	mux.HandleFunc("GET /breaks", handlers.NewBreaksHandler(pool).HandleBreaks)
 
 	mux.HandleFunc("GET /", handlers.HandleRoot)
 

@@ -1,4 +1,4 @@
-import {createLazyFileRoute} from '@tanstack/react-router'
+import {createLazyFileRoute, useNavigate} from '@tanstack/react-router'
 import {useFetchBreaks} from "../hooks/useFetchBreaks.tsx";
 
 export const Route = createLazyFileRoute('/')({
@@ -7,6 +7,14 @@ export const Route = createLazyFileRoute('/')({
 
 function RouteComponent() {
     const {breaks} = useFetchBreaks()
+    const navigate = useNavigate()
+
+    const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedSlug = event.target.value;
+        navigate({
+            to: `/breaks/${selectedSlug}`,
+        })
+    }
 
     return (
         <>
@@ -17,6 +25,7 @@ function RouteComponent() {
                     className="text-md bg-white disabled:opacity-50 disabled:cursor-not-allowed text-black p-2 rounded shadow-lg font-medium min-w-[200px] text-center"
                     disabled={breaks.length === 0}
                     defaultValue="default"
+                    onChange={handleChange}
             >
                 <option disabled value="default">Choose a break</option>
                 {

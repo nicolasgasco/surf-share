@@ -10,8 +10,10 @@ export function HomePage() {
 
             <select name="breaks"
                     className="text-md bg-white disabled:opacity-50 disabled:cursor-not-allowed text-black p-2 rounded shadow-lg font-medium min-w-[200px] text-center"
-                    disabled={breaks.length === 0}>
-                <option selected disabled>Choose a break</option>
+                    disabled={breaks.length === 0}
+                    defaultValue="default"
+            >
+                <option disabled value="default">Choose a break</option>
                 {
                     breaks.map((breakSummary) => (
                         <option key={breakSummary.id} value={breakSummary.slug}>

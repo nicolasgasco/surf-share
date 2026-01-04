@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"surf-share/app/handlers"
+	"surf-share/app/middleware"
 )
 
 func main() {
@@ -37,5 +38,8 @@ func main() {
 
 	port := os.Getenv("PORT")
 	fmt.Printf("Server is listening to port %s\n", port)
-	http.ListenAndServe(":"+port, mux)
+
+	// Wrap mux with CORS middleware
+	handler := middleware.CORS(mux)
+	http.ListenAndServe(":"+port, handler)
 }

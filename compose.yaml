@@ -5,9 +5,15 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    ports:
+      - "8080:8080"
     volumes:
       - ./app:/go/app:rw
-    command: tail -f /dev/null # TODO replace once server is implemented
+      - ./docker/app_entrypoint.sh:/go/app/entrypoint.sh:ro
+    entrypoint: [ 'sh', '/go/app/entrypoint.sh' ]
+    environment:
+      - PORT=8080
+    command: sh -c "cd /go/app && go run main.go"
 
   db:
     image: postgres:18

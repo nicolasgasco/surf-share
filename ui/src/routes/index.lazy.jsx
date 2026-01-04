@@ -1,6 +1,11 @@
+import {createLazyFileRoute} from '@tanstack/react-router'
 import {useFetchBreaks} from "../hooks/useFetchBreaks.tsx";
 
-export function HomePage() {
+export const Route = createLazyFileRoute('/')({
+    component: RouteComponent,
+})
+
+function RouteComponent() {
     const {breaks} = useFetchBreaks()
 
     return (

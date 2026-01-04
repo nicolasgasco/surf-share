@@ -3,3 +3,4 @@
 
 # Secrets
 /db/password
+/app/tmp/

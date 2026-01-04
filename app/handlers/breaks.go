@@ -48,3 +48,23 @@ func (h *BreaksHandler) HandleBreaks(w http.ResponseWriter, _ *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
+func (h *BreaksHandler) HandleBreakBySlug(w http.ResponseWriter, r *http.Request) {
+	slug := r.PathValue("slug")
+
+	var brk models.Break
+	err := h.pool.QueryRow(context.Background(),
+		"SELECT id, name, slug, description, coordinates, country, region, city, created_at, updated_at FROM app.breaks WHERE slug=$1", slug).Scan(
+		&brk.ID, &brk.Name, &brk.Slug, &brk.Description, &brk.Coordinates,
+		&brk.Country, &brk.Region, &brk.City, &brk.CreatedAt, &brk.UpdatedAt)
+
+	if err != nil {
+		http.Error(w, "Break not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(brk); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}

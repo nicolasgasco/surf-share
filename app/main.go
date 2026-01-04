@@ -33,6 +33,7 @@ func main() {
 
 	// Breaks
 	mux.HandleFunc("GET /breaks", handlers.NewBreaksHandler(pool).HandleBreaks)
+	mux.HandleFunc("GET /breaks/{slug}", handlers.NewBreaksHandler(pool).HandleBreakBySlug)
 
 	mux.HandleFunc("GET /", handlers.HandleRoot)
 

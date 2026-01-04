@@ -1,14 +1,22 @@
 set -euo pipefail
 
+# Required pgx
+export DB_PASSWORD=$(cat /run/secrets/db_password)
+
 cd /go/app
 
-DB_HOST="${DB_HOST:-db}"
-DB_PORT="${DB_PORT:-5432}"
-until pg_isready -h "$DB_HOST" -p "$DB_PORT" >/dev/null 2>&1; do
-  echo "waiting for database at $DB_HOST:$DB_PORT..."
-  sleep 1
-done
+echo "Installing pgx and dependencies..."
+go get github.com/jackc/pgx/v5
+go get github.com/jackc/pgx/v5/pgconn
+go get github.com/jackc/pgx/v5/pgtype
 
+echo "Tidying go modules..."
+go mod tidy
+
+echo "Downloading all dependencies..."
+go mod download
+
+echo "Starting the application..."
 if command -v air >/dev/null 2>&1; then
   exec air -c .air.toml
 else

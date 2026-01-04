@@ -7,9 +7,9 @@ import (
 )
 
 type BreakSummary struct {
-	ID   int32  `json:"id"`
-	Name string `json:"name"`
-	Slug string `json:"slug"`
+	ID   pgtype.UUID `json:"id"`
+	Name string      `json:"name"`
+	Slug string      `json:"slug"`
 }
 
 type Break struct {

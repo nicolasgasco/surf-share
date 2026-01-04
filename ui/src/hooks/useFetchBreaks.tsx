@@ -1,10 +1,10 @@
 import {useEffect, useState} from "react";
-import type {BreakSummary} from "../types/breakSummary.tsx";
+import type {Breaks} from "../types/breaks.tsx";
 
 export function useFetchBreaks(): {
-    breaks: BreakSummary[];
+    breaks: Breaks[];
 } {
-    const [breaks, setBreaks] = useState<BreakSummary[]>([]);
+    const [breaks, setBreaks] = useState<Breaks[]>([]);
 
     useEffect(() => {
         async function fetchBreaks() {
@@ -18,7 +18,7 @@ export function useFetchBreaks(): {
             }
 
             const {breaks}: {
-                breaks: BreakSummary[];
+                breaks: Breaks[];
                 count: number;
             } = await response.json();
 

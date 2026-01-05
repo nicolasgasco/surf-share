@@ -22,8 +22,8 @@ services:
       - "8080:8080"
     volumes:
       - ./app:/go/app:rw
-      - ./docker/app_entrypoint.sh:/go/app/entrypoint.sh:ro
-    entrypoint: [ 'sh', '/go/app/entrypoint.sh' ]
+      - ./docker/app_entrypoint.sh:/go/entrypoint.sh:ro
+    entrypoint: [ 'sh', '/go/entrypoint.sh' ]
     secrets:
       - db_password
     environment:

@@ -16,4 +16,16 @@ CREATE TABLE IF NOT EXISTS app.breaks (
 );
 
 COPY app.breaks(name,slug,description,coordinates,country,region,city)
-  FROM '/docker-entrypoint-initdb.d/breaks_seeds.csv' CSV HEADER;
+    FROM '/docker-entrypoint-initdb.d/breaks_seeds.csv' CSV HEADER;
+
+CREATE TABLE IF NOT EXISTS app.breaks_media (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    break_id UUID NOT NULL REFERENCES app.breaks(id) ON DELETE CASCADE,
+    video_url TEXT,
+    image_urls TEXT[],
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+COPY app.breaks_media(break_slug,video_url,image_urls)
+    FROM '/docker-entrypoint-initdb.d/breaks_media_seeds.csv' CSV HEADER;
+

@@ -53,10 +53,16 @@ func (h *BreaksHandler) HandleBreakBySlug(w http.ResponseWriter, r *http.Request
 	slug := r.PathValue("slug")
 
 	var brk models.Break
+
 	err := h.pool.QueryRow(context.Background(),
-		"SELECT id, name, slug, description, coordinates, country, region, city, created_at, updated_at FROM app.breaks WHERE slug=$1", slug).Scan(
+		`SELECT b.id, b.name, b.slug, b.description, b.coordinates, b.country, b.region, b.city, b.created_at, b.updated_at,
+		        m.video_url, m.image_urls
+		 FROM app.breaks b
+		 LEFT JOIN app.breaks_media m ON b.id = m.break_id
+		 WHERE b.slug = $1`, slug).Scan(
 		&brk.ID, &brk.Name, &brk.Slug, &brk.Description, &brk.Coordinates,
-		&brk.Country, &brk.Region, &brk.City, &brk.CreatedAt, &brk.UpdatedAt)
+		&brk.Country, &brk.Region, &brk.City, &brk.CreatedAt, &brk.UpdatedAt,
+		&brk.VideoUrl, &brk.ImageUrls)
 
 	if err != nil {
 		http.Error(w, "Break not found", http.StatusNotFound)

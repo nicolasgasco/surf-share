@@ -32,7 +32,7 @@ function RouteComponent() {
 
             {videoUrl && (
                 <iframe src={videoUrl} title={`Webcam feed for ${name}`}
-                        className="w-full h-full max-w-[800px] aspect-video"/>
+                        className="w-full h-full max-w-[800px] aspect-video" allowFullScreen/>
             )}
 
             {imageUrls && imageUrls.length > 0 && (

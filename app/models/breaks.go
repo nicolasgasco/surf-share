@@ -1,8 +1,6 @@
 package models
 
 import (
-	"time"
-
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -19,8 +17,6 @@ type Break struct {
 	Country     string       `json:"country"`
 	Region      pgtype.Text  `json:"region"`
 	City        pgtype.Text  `json:"city"`
-	CreatedAt   time.Time    `json:"created_at"`
-	UpdatedAt   time.Time    `json:"updated_at"`
 	VideoUrl    pgtype.Text  `json:"video_url"`
 	ImageUrls   []string     `json:"image_urls"`
 }

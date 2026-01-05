@@ -10,8 +10,6 @@ export interface Break extends Breaks {
     country: string;
     region: string;
     city: string;
-    createdAt: string;
-    updatedAt: string;
     videoUrl: string | null;
     imageUrls: string[] | null;
 }

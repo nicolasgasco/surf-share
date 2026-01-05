@@ -1,5 +1,6 @@
 import type {Break} from "../types/breaks.tsx";
 import {useEffect, useState} from "react";
+import camelize from "camelize";
 
 export function useFetchBreakBySlug(slug: string): { data: Break | null, isLoading: boolean } {
     const [breakData, setBreakData] = useState<Break | null>(null);
@@ -16,8 +17,8 @@ export function useFetchBreakBySlug(slug: string): { data: Break | null, isLoadi
                 return;
             }
 
-            const breakInfo: Break = await response.json();
-            setBreakData(breakInfo);
+            const breakInfo = await response.json();
+            setBreakData(camelize(breakInfo));
 
             setIsLoading(false);
         }

@@ -12,4 +12,6 @@ export interface Break extends Breaks {
     city: string;
     createdAt: string;
     updatedAt: string;
+    videoUrl: string | null;
+    imageUrls: string[] | null;
 }

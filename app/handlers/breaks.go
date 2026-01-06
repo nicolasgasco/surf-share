@@ -18,7 +18,7 @@ func NewBreaksHandler(pool *pgxpool.Pool) *BreaksHandler {
 }
 
 func (h *BreaksHandler) HandleBreaks(w http.ResponseWriter, _ *http.Request) {
-	rows, err := h.pool.Query(context.Background(), "SELECT id, name, slug FROM app.breaks")
+	rows, err := h.pool.Query(context.Background(), "SELECT id, name, slug FROM app.breaks ORDER BY name ASC")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

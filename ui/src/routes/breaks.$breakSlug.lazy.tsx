@@ -39,7 +39,7 @@ function RouteComponent() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-12"
                      aria-label={`Webcam images for ${name}`}>
                     {imageUrls.map((url) => (
-                        <a href={url} rel="noopener noreferrer" target="_blank" aria-hidden="true">
+                        <a href={url} rel="noopener noreferrer" target="_blank" aria-hidden={true}>
                             <img key={url} src={url} className=" w-full h-auto rounded-lg shadow-md" alt=""/>
                         </a>
                     ))}

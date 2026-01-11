@@ -38,10 +38,11 @@ func main() {
 	mux.HandleFunc("GET /", handlers.HandleRoot)
 
 	port := os.Getenv("PORT")
-	fmt.Printf("Server is listening to port %s\n", port)
 
 	// Wrap mux with CORS middleware
 	handler := middleware.CORS(mux)
+
+	fmt.Printf("Server is listening to port %s\n", port)
 	if err := http.ListenAndServe(":"+port, handler); err != nil {
 		fmt.Println("Error starting application")
 	}

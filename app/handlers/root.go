@@ -5,6 +5,6 @@ import (
 )
 
 func HandleRoot(w http.ResponseWriter, r *http.Request) {
-	filePath := "static/app.html"
+	filePath := "templates/root.html"
 	http.ServeFile(w, r, filePath)
 }

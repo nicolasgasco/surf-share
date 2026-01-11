@@ -18,16 +18,18 @@ func NewBreaksHandler(pool *pgxpool.Pool) *BreaksHandler {
 }
 
 func (h *BreaksHandler) HandleBreaks(w http.ResponseWriter, _ *http.Request) {
-	rows, err := h.pool.Query(context.Background(), "SELECT id, name, slug FROM app.breaks ORDER BY name ASC")
+	rows, err := h.pool.Query(context.Background(),
+		"SELECT id, name, slug FROM app.breaks ORDER BY name ASC",
+	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
 
-	var breaks []models.BreakSummary
+	var breaks []models.BreaksResponse
 	for rows.Next() {
-		var brk models.BreakSummary
+		var brk models.BreaksResponse
 		if err := rows.Scan(&brk.ID, &brk.Name, &brk.Slug); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -36,8 +38,8 @@ func (h *BreaksHandler) HandleBreaks(w http.ResponseWriter, _ *http.Request) {
 	}
 
 	resp := struct {
-		Count  int                   `json:"count"`
-		Breaks []models.BreakSummary `json:"breaks"`
+		Count  int                     `json:"count"`
+		Breaks []models.BreaksResponse `json:"breaks"`
 	}{
 		Count:  len(breaks),
 		Breaks: breaks,
@@ -52,13 +54,14 @@ func (h *BreaksHandler) HandleBreaks(w http.ResponseWriter, _ *http.Request) {
 func (h *BreaksHandler) HandleBreakBySlug(w http.ResponseWriter, r *http.Request) {
 	slug := r.PathValue("slug")
 
-	var brk models.Break
+	var brk models.BreakResponse
 
 	err := h.pool.QueryRow(context.Background(),
 		`SELECT b.id, b.name, b.slug, b.description, b.coordinates, b.country, b.region, b.city, m.video_url, m.image_urls
 		 FROM app.breaks b
 		 LEFT JOIN app.breaks_media m ON b.slug = m.break_slug
-		 WHERE b.slug = $1`, slug).Scan(&brk.ID, &brk.Name, &brk.Slug, &brk.Description, &brk.Coordinates, &brk.Country, &brk.Region, &brk.City, &brk.VideoUrl, &brk.ImageUrls)
+		 WHERE b.slug = $1`,
+		slug).Scan(&brk.ID, &brk.Name, &brk.Slug, &brk.Description, &brk.Coordinates, &brk.Country, &brk.Region, &brk.City, &brk.VideoUrl, &brk.ImageUrls)
 
 	if err != nil {
 		http.Error(w, "Break not found", http.StatusNotFound)

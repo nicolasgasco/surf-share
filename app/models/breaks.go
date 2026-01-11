@@ -4,14 +4,16 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type BreakSummary struct {
+type BreaksResponse struct {
 	ID   pgtype.UUID `json:"id"`
 	Name string      `json:"name"`
 	Slug string      `json:"slug"`
 }
 
-type Break struct {
-	BreakSummary
+type BreakResponse struct {
+	ID          pgtype.UUID  `json:"id"`
+	Name        string       `json:"name"`
+	Slug        string       `json:"slug"`
 	Description pgtype.Text  `json:"description"`
 	Coordinates pgtype.Point `json:"coordinates"`
 	Country     string       `json:"country"`

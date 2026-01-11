@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-
-	"github.com/jackc/pgx/v5/pgxpool"
+	"surf-share/app/adapters"
 
 	"surf-share/app/handlers"
 	"surf-share/app/middleware"
@@ -22,18 +21,19 @@ func main() {
 		os.Getenv("DB_NAME"),
 	)
 
-	pool, err := pgxpool.New(context.Background(), connStr)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
-		os.Exit(1)
+	ctx := context.Background()
+
+	dbAdapter := adapters.DatabaseAdapter{}
+	if err := dbAdapter.Connect(ctx, connStr); err != nil {
+		panic(err)
 	}
-	defer pool.Close()
+	defer dbAdapter.Close()
 
 	mux := http.NewServeMux()
 
 	// Breaks
-	mux.HandleFunc("GET /breaks", handlers.NewBreaksHandler(pool).HandleBreaks)
-	mux.HandleFunc("GET /breaks/{slug}", handlers.NewBreaksHandler(pool).HandleBreakBySlug)
+	mux.HandleFunc("GET /breaks", handlers.NewBreaksHandler(&dbAdapter).HandleBreaks)
+	mux.HandleFunc("GET /breaks/{slug}", handlers.NewBreaksHandler(&dbAdapter).HandleBreakBySlug)
 
 	mux.HandleFunc("GET /", handlers.HandleRoot)
 
@@ -42,5 +42,7 @@ func main() {
 
 	// Wrap mux with CORS middleware
 	handler := middleware.CORS(mux)
-	http.ListenAndServe(":"+port, handler)
+	if err := http.ListenAndServe(":"+port, handler); err != nil {
+		fmt.Println("Error starting application")
+	}
 }

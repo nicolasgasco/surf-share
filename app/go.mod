@@ -2,7 +2,10 @@ module surf-share/app
 
 go 1.25.4
 
-require github.com/jackc/pgx/v5 v5.8.0
+require (
+	github.com/georgysavva/scany/v2 v2.1.4
+	github.com/jackc/pgx/v5 v5.8.0
+)
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect

@@ -11,6 +11,7 @@ go get github.com/jackc/pgx/v5
 go get github.com/jackc/pgx/v5/pgconn
 go get github.com/jackc/pgx/v5/pgtype
 go get github.com/jackc/pgx/v5/pgxpool
+go get github.com/georgysavva/scany/v2
 
 echo "Installing air for hot reload..."
 go install github.com/air-verse/air@latest

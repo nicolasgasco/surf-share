@@ -6,6 +6,9 @@ export DB_PASSWORD
 
 cd /go/app
 
+echo "Installing make command..."
+apk add --no-cache make
+
 echo "Installing pgx and dependencies..."
 go get github.com/jackc/pgx/v5
 go get github.com/jackc/pgx/v5/pgconn

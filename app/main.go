@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"surf-share/app/adapters"
-
-	"surf-share/app/handlers"
-	"surf-share/app/middleware"
+	"surf-share/app/internal/adapters"
+	"surf-share/app/internal/handlers"
+	"surf-share/app/internal/middleware"
 )
 
 func main() {

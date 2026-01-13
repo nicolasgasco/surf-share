@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"surf-share/app/adapters"
-	"surf-share/app/models"
+	"surf-share/app/internal/adapters"
+	"surf-share/app/internal/models"
 )
 
 type BreaksHandler struct {

@@ -28,6 +28,7 @@ services:
       - db_password
     environment:
       - DB_HOST=db
+      - DB_HOST_TEST=db-test
       - DB_NAME=surf-share
       - DB_PASSWORD_FILE=/run/secrets/db_password
       - DB_PORT=5432
@@ -61,8 +62,22 @@ services:
       timeout: 5s
       retries: 10
 
+  db-test:
+    image: postgres:18-alpine
+    restart: always
+    user: postgres
+    secrets:
+      - db_password
+    volumes:
+      - db_test_data:/var/lib/postgresql
+      - ./db/scripts:/docker-entrypoint-initdb.d:ro
+    environment:
+      - POSTGRES_DB=surf-share
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
+
 volumes:
   db_data:
+  db_test_data:
 
 secrets:
   db_password:

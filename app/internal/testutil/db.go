@@ -6,9 +6,9 @@ import (
 )
 
 func GetDbConnectionString() (string, error) {
-	dbHost := os.Getenv("DB_HOST")
+	dbHost := os.Getenv("DB_HOST_TEST")
 	if dbHost == "" {
-		return "", fmt.Errorf("DB_HOST environment variable is not set")
+		return "", fmt.Errorf("DB_HOST_TEST environment variable is not set")
 	}
 
 	dbPort := os.Getenv("DB_PORT")

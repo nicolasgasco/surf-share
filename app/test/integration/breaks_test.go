@@ -56,8 +56,8 @@ func TestGetBreaks(t *testing.T) {
 		t.Fatalf("Failed to decode response: %v", err)
 	}
 
-	if response.Count != len(response.Breaks) {
-		t.Fatalf("Expected count %d to match breaks length %d", response.Count, len(response.Breaks))
+	if response.Count != len(response.Breaks) || response.Count == 0 {
+		t.Fatalf("Expected count %d to match breaks length %d and not be 0", response.Count, len(response.Breaks))
 	}
 
 	if response.Breaks[0].Slug != "la-arena" {

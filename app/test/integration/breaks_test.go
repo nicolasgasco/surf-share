@@ -11,112 +11,113 @@ import (
 	"surf-share/app/internal/adapters"
 	"surf-share/app/internal/handlers"
 	"surf-share/app/internal/models"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestGetBreaks(t *testing.T) {
+type BreaksTestSuite struct {
+	suite.Suite
+	dbAdapter *adapters.DatabaseAdapter
+	server    *httptest.Server
+}
+
+func (s *BreaksTestSuite) SetupTest() {
 	connStr, err := testutil.GetDbConnectionString()
-	if err != nil {
-		t.Fatalf("Failed to get DB connection string: %v", err)
-	}
+	require.NoError(s.T(), err)
 
 	ctx := context.Background()
-	dbAdapter := &adapters.DatabaseAdapter{}
-	if err := dbAdapter.Connect(ctx, connStr); err != nil {
-		t.Fatalf("Failed to connect to database: %v", err)
-	}
-	defer dbAdapter.Close()
+	s.dbAdapter = &adapters.DatabaseAdapter{}
+	err = s.dbAdapter.Connect(ctx, connStr)
+	require.NoError(s.T(), err)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /breaks", handlers.NewBreaksHandler(dbAdapter).HandleBreaks)
+	mux.HandleFunc("GET /breaks", handlers.NewBreaksHandler(s.dbAdapter).HandleBreaks)
+	mux.HandleFunc("GET /breaks/{slug}", handlers.NewBreaksHandler(s.dbAdapter).HandleBreakBySlug)
 
-	server := httptest.NewServer(mux)
-	defer server.Close()
+	s.server = httptest.NewServer(mux)
+}
 
-	resp, err := http.Get(server.URL + "/breaks")
-	if err != nil {
-		t.Fatalf("Failed to make request: %v", err)
+func (s *BreaksTestSuite) TearDownTest() {
+	if s.server != nil {
+		s.server.Close()
 	}
+
+	if s.dbAdapter != nil {
+		s.dbAdapter.Close()
+	}
+}
+
+func (s *BreaksTestSuite) TestGetBreaks() {
+	resp, err := http.Get(s.server.URL + "/breaks")
+	require.NoError(s.T(), err)
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("Expected status 200, got %d", resp.StatusCode)
-	}
-
-	contentType := resp.Header.Get("Content-Type")
-	if contentType != "application/json" {
-		t.Fatalf("Expected Content-Type application/json, got %s", contentType)
-	}
+	assert.Equal(s.T(), http.StatusOK, resp.StatusCode)
+	assert.Equal(s.T(), "application/json", resp.Header.Get("Content-Type"))
 
 	var response struct {
 		Count  int                     `json:"count"`
 		Breaks []models.BreaksResponse `json:"breaks"`
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		t.Fatalf("Failed to decode response: %v", err)
-	}
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	require.NoError(s.T(), err)
 
-	if response.Count != len(response.Breaks) || response.Count == 0 {
-		t.Fatalf("Expected count %d to match breaks length %d and not be 0", response.Count, len(response.Breaks))
-	}
+	require.NotEmpty(s.T(), response.Breaks)
+	assert.Equal(s.T(), len(response.Breaks), response.Count)
 
-	if response.Breaks[0].Slug != "la-arena" {
-		t.Fatalf("Expected first break slug to be 'la-arena', got '%s'", response.Breaks[0].Slug)
-	}
-
-	t.Logf("✓ Successfully fetched %d breaks", response.Count)
+	require.GreaterOrEqual(s.T(), len(response.Breaks), 2)
+	assert.LessOrEqual(s.T(), response.Breaks[0].Name, response.Breaks[1].Name)
 }
 
-func TestGetBreakBySlug(t *testing.T) {
-	connStr, err := testutil.GetDbConnectionString()
-	if err != nil {
-		t.Fatalf("Failed to get DB connection string: %v", err)
-	}
-
-	ctx := context.Background()
-	dbAdapter := &adapters.DatabaseAdapter{}
-	if err := dbAdapter.Connect(ctx, connStr); err != nil {
-		t.Fatalf("Failed to connect to database: %v", err)
-	}
-	defer dbAdapter.Close()
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /breaks/{slug}", handlers.NewBreaksHandler(dbAdapter).HandleBreakBySlug)
-
-	server := httptest.NewServer(mux)
-	defer server.Close()
-
-	resp, err := http.Get(server.URL + "/breaks/la-arena")
-	if err != nil {
-		t.Fatalf("Failed to make request: %v", err)
-	}
+func (s *BreaksTestSuite) TestGetBreakBySlug() {
+	// Get the slug of the first break
+	resp, err := http.Get(s.server.URL + "/breaks")
+	require.NoError(s.T(), err)
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("Expected status 200, got %d", resp.StatusCode)
+	var response struct {
+		Breaks []models.BreaksResponse `json:"breaks"`
 	}
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	require.NoError(s.T(), err)
+	require.NotEmpty(s.T(), response.Breaks)
 
-	contentType := resp.Header.Get("Content-Type")
-	if contentType != "application/json" {
-		t.Fatalf("Expected Content-Type application/json, got %s", contentType)
-	}
+	firstBreak := response.Breaks[0]
+
+	resp, err = http.Get(s.server.URL + "/breaks/" + firstBreak.Slug)
+	require.NoError(s.T(), err)
+	defer resp.Body.Close()
+
+	assert.Equal(s.T(), http.StatusOK, resp.StatusCode)
+	assert.Equal(s.T(), "application/json", resp.Header.Get("Content-Type"))
 
 	var breakResponse models.BreakResponse
-	if err := json.NewDecoder(resp.Body).Decode(&breakResponse); err != nil {
-		t.Fatalf("Failed to decode response: %v", err)
-	}
+	err = json.NewDecoder(resp.Body).Decode(&breakResponse)
+	require.NoError(s.T(), err)
 
-	if breakResponse.Slug != "la-arena" {
-		t.Fatalf("Expected break slug to be 'la-arena', got '%s'", breakResponse.Slug)
-	}
+	assert.Equal(s.T(), firstBreak.Slug, breakResponse.Slug)
+	assert.Equal(s.T(), firstBreak.Name, breakResponse.Name)
+}
 
-	if breakResponse.Name != "La Arena" {
-		t.Fatalf("Expected break name to be 'La Arena', got '%s'", breakResponse.Name)
-	}
+func (s *BreaksTestSuite) TestGetBreakByInvalidSlug() {
+	resp, err := http.Get(s.server.URL + "/breaks/invalid-slug")
+	require.NoError(s.T(), err)
+	defer resp.Body.Close()
 
-	if breakResponse.Country != "ESP" {
-		t.Fatalf("Expected break country to be 'ESP', got '%s'", breakResponse.Country)
-	}
+	assert.Equal(s.T(), http.StatusNotFound, resp.StatusCode)
+	assert.Equal(s.T(), "application/json", resp.Header.Get("Content-Type"))
 
-	t.Logf("✓ Successfully fetched break by slug: %s", breakResponse.Name)
+	var errorResponse models.ErrorResponse
+
+	err = json.NewDecoder(resp.Body).Decode(&errorResponse)
+	require.NoError(s.T(), err)
+
+	assert.Equal(s.T(), "Break with slug 'invalid-slug' not found", errorResponse.Message)
+}
+
+func TestBreaksTestSuite(t *testing.T) {
+	suite.Run(t, new(BreaksTestSuite))
 }

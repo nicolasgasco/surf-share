@@ -5,22 +5,19 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"surf-share/app/config"
 	"surf-share/app/internal/adapters"
 	"surf-share/app/internal/handlers"
 	"surf-share/app/internal/middleware"
 )
 
 func main() {
-	connStr := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
-	)
-
 	ctx := context.Background()
+
+	connStr, err := config.GetDatabaseConnectionString()
+	if err != nil {
+		panic(err)
+	}
 
 	dbAdapter := adapters.DatabaseAdapter{}
 	if err := dbAdapter.Connect(ctx, connStr); err != nil {

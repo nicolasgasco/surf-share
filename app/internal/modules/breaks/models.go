@@ -1,4 +1,4 @@
-package models
+package breaks
 
 import (
 	"github.com/jackc/pgx/v5/pgtype"

@@ -1,4 +1,4 @@
-package handlers
+package breaks
 
 import (
 	"context"
@@ -20,15 +20,15 @@ func NewBreaksHandler(dbAdapter *adapters.DatabaseAdapter) *BreaksHandler {
 func (h *BreaksHandler) HandleBreaks(w http.ResponseWriter, _ *http.Request) {
 	ctx := context.Background()
 
-	var breaks []models.BreaksResponse = make([]models.BreaksResponse, 0)
+	var breaks []BreaksResponse = make([]BreaksResponse, 0)
 	if err := h.dbAdapter.FindMany(ctx, &breaks, "SELECT id, name, slug FROM app.breaks ORDER BY name ASC"); err != nil {
 		http.Error(w, "Failed to fetch breaks", http.StatusInternalServerError)
 		return
 	}
 
 	resp := struct {
-		Count  int                     `json:"count"`
-		Breaks []models.BreaksResponse `json:"breaks"`
+		Count  int              `json:"count"`
+		Breaks []BreaksResponse `json:"breaks"`
 	}{
 		Count:  len(breaks),
 		Breaks: breaks,
@@ -49,7 +49,7 @@ func (h *BreaksHandler) HandleBreakBySlug(w http.ResponseWriter, r *http.Request
 
 	ctx := context.Background()
 
-	var brk models.BreakResponse
+	var brk BreakResponse
 	err := h.dbAdapter.FindOne(
 		ctx,
 		&brk,

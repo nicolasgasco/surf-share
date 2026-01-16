@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"surf-share/app/internal/adapters"
-	"surf-share/app/internal/handlers"
 	"surf-share/app/internal/models"
+	"surf-share/app/internal/modules/breaks"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -33,8 +33,9 @@ func (s *BreaksTestSuite) SetupTest() {
 	require.NoError(s.T(), err)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /breaks", handlers.NewBreaksHandler(s.dbAdapter).HandleBreaks)
-	mux.HandleFunc("GET /breaks/{slug}", handlers.NewBreaksHandler(s.dbAdapter).HandleBreakBySlug)
+	breaksHandler := breaks.NewBreaksHandler(s.dbAdapter)
+	mux.HandleFunc("GET /breaks", breaksHandler.HandleBreaks)
+	mux.HandleFunc("GET /breaks/{slug}", breaksHandler.HandleBreakBySlug)
 
 	s.server = httptest.NewServer(mux)
 }
@@ -59,7 +60,7 @@ func (s *BreaksTestSuite) TestGetBreaks() {
 
 	var response struct {
 		Count  int                     `json:"count"`
-		Breaks []models.BreaksResponse `json:"breaks"`
+		Breaks []breaks.BreaksResponse `json:"breaks"`
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&response)
@@ -79,7 +80,7 @@ func (s *BreaksTestSuite) TestGetBreakBySlug() {
 	defer resp.Body.Close()
 
 	var response struct {
-		Breaks []models.BreaksResponse `json:"breaks"`
+		Breaks []breaks.BreaksResponse `json:"breaks"`
 	}
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	require.NoError(s.T(), err)
@@ -94,7 +95,7 @@ func (s *BreaksTestSuite) TestGetBreakBySlug() {
 	assert.Equal(s.T(), http.StatusOK, resp.StatusCode)
 	assert.Equal(s.T(), "application/json", resp.Header.Get("Content-Type"))
 
-	var breakResponse models.BreakResponse
+	var breakResponse breaks.BreakResponse
 	err = json.NewDecoder(resp.Body).Decode(&breakResponse)
 	require.NoError(s.T(), err)
 

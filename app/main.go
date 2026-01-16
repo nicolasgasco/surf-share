@@ -9,6 +9,7 @@ import (
 	"surf-share/app/internal/adapters"
 	"surf-share/app/internal/handlers"
 	"surf-share/app/internal/middleware"
+	"surf-share/app/internal/modules/breaks"
 )
 
 func main() {
@@ -27,17 +28,14 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	// Breaks
-	mux.HandleFunc("GET /breaks", handlers.NewBreaksHandler(&dbAdapter).HandleBreaks)
-	mux.HandleFunc("GET /breaks/{slug}", handlers.NewBreaksHandler(&dbAdapter).HandleBreakBySlug)
+	breaksModule := breaks.NewBreaksModule(&dbAdapter)
+	breaksModule.Register(mux)
 
 	mux.HandleFunc("GET /", handlers.HandleRoot)
 
-	port := os.Getenv("PORT")
-
-	// Wrap mux with CORS middleware
 	handler := middleware.CORS(mux)
 
+	port := os.Getenv("PORT")
 	fmt.Printf("Server is listening to port %s\n", port)
 	if err := http.ListenAndServe(":"+port, handler); err != nil {
 		fmt.Println("Error starting application")

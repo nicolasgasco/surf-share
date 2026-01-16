@@ -9,6 +9,7 @@ import (
 	"surf-share/app/internal/adapters"
 	"surf-share/app/internal/handlers"
 	"surf-share/app/internal/middleware"
+	"surf-share/app/internal/modules/auth"
 	"surf-share/app/internal/modules/breaks"
 )
 
@@ -30,6 +31,9 @@ func main() {
 
 	breaksModule := breaks.NewBreaksModule(&dbAdapter)
 	breaksModule.Register(mux)
+
+	authModule := auth.NewAuthModule(&dbAdapter)
+	authModule.Register(mux)
 
 	mux.HandleFunc("GET /", handlers.HandleRoot)
 

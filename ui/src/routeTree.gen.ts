@@ -12,9 +12,15 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './routes/__root'
 
+const SigninLazyRouteImport = createFileRoute('/signin')()
 const IndexLazyRouteImport = createFileRoute('/')()
 const BreaksBreakSlugLazyRouteImport = createFileRoute('/breaks/$breakSlug')()
 
+const SigninLazyRoute = SigninLazyRouteImport.update({
+  id: '/signin',
+  path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/signin.lazy').then((d) => d.Route))
 const IndexLazyRoute = IndexLazyRouteImport.update({
   id: '/',
   path: '/',
@@ -30,32 +36,43 @@ const BreaksBreakSlugLazyRoute = BreaksBreakSlugLazyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
+  '/signin': typeof SigninLazyRoute
   '/breaks/$breakSlug': typeof BreaksBreakSlugLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/signin': typeof SigninLazyRoute
   '/breaks/$breakSlug': typeof BreaksBreakSlugLazyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexLazyRoute
+  '/signin': typeof SigninLazyRoute
   '/breaks/$breakSlug': typeof BreaksBreakSlugLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/breaks/$breakSlug'
+  fullPaths: '/' | '/signin' | '/breaks/$breakSlug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/breaks/$breakSlug'
-  id: '__root__' | '/' | '/breaks/$breakSlug'
+  to: '/' | '/signin' | '/breaks/$breakSlug'
+  id: '__root__' | '/' | '/signin' | '/breaks/$breakSlug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
+  SigninLazyRoute: typeof SigninLazyRoute
   BreaksBreakSlugLazyRoute: typeof BreaksBreakSlugLazyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -75,6 +92,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
+  SigninLazyRoute: SigninLazyRoute,
   BreaksBreakSlugLazyRoute: BreaksBreakSlugLazyRoute,
 }
 export const routeTree = rootRouteImport

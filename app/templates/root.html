@@ -26,12 +26,21 @@
 </h1>
 <p>These are the endpoints that are currently supported:</p>
 <ul>
-    <li>
-        <a href="/breaks">GET /breaks</a>: list all available surf breaks.
+    <li>Breaks:
+        <ul>
+            <li>
+                <a href="/breaks">GET /breaks</a>: list all available surf breaks.
+            </li>
+            <li>
+                <a href="/breaks/la-arena">GET /breaks/{slug}</a>: retrieve detailed
+                information about a specific surf break identified by its slug.
+            </li>
+        </ul>
     </li>
-    <li>
-        <a href="/breaks/la-arena">GET /breaks/{slug}</a>: retrieve detailed
-        information about a specific surf break identified by its slug.
+    <li>Auth:
+        <ul>
+            <li><code>POST /auth/register {username, email, password}</code>: register a new user.</li>
+        </ul>
     </li>
 </ul>
 </body>

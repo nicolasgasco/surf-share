@@ -61,3 +61,16 @@ func (db *DatabaseAdapter) FindOne(ctx context.Context, dest any, query string, 
 
 	return nil
 }
+
+func (db *DatabaseAdapter) Exec(ctx context.Context, query string, args ...any) error {
+	if db.Db == nil {
+		return errors.New("database is not initialized")
+	}
+
+	_, err := db.Db.Exec(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

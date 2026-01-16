@@ -2,6 +2,7 @@
 
 CREATE SCHEMA IF NOT EXISTS app;
 
+// Breaks
 BEGIN;
 
 CREATE TABLE IF NOT EXISTS app.breaks (
@@ -30,5 +31,33 @@ CREATE TABLE IF NOT EXISTS app.breaks_media (
 
 COPY app.breaks_media(break_slug,video_url,image_urls)
     FROM '/docker-entrypoint-initdb.d/breaks_media_seeds.csv' CSV HEADER;
+
+// Auth
+COMMIT;
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS app.users
+(
+    id
+    UUID
+    PRIMARY
+    KEY
+    DEFAULT
+    gen_random_uuid
+(
+),
+    username VARCHAR
+(
+    50
+) NOT NULL UNIQUE,
+    email VARCHAR
+(
+    100
+) NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
 
 COMMIT;

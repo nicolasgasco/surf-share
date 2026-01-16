@@ -27,7 +27,7 @@ function RouteComponent() {
 
     return (
         <div className="max-w-3xl flex flex-col items-center justify-center text-center">
-            <h1 className="mb-6">Your break info for {name} ({region}, {country})</h1>
+            <h1 className="mb-4">Your break info for {name} ({region}, {country})</h1>
             <p className="mb-12 text-md">{description}</p>
 
             {videoUrl && (

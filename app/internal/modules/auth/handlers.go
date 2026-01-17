@@ -32,9 +32,16 @@ func (h *AuthHandler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Password is required", http.StatusBadRequest)
 		return
 	}
+	hashedPassword, err := encryptPassword(password)
+	if err != nil {
+		http.Error(w, "Failed to encrypt password", http.StatusInternalServerError)
+		return
+	}
 
 	ctx := context.Background()
-	err := h.dbAdapter.Exec(ctx, "INSERT INTO app.users (username, email, password) VALUES ($1, $2, $3)", username, email, password)
+	err = h.dbAdapter.Exec(ctx,
+		"INSERT INTO app.users (username, email, password) VALUES ($1, $2, $3)",
+		username, email, hashedPassword)
 	if err != nil {
 		http.Error(w, "Failed to register user", http.StatusBadRequest)
 		return

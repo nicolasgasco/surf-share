@@ -6,6 +6,7 @@ require (
 	github.com/georgysavva/scany/v2 v2.1.4
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/stretchr/testify v1.11.1
+	golang.org/x/crypto v0.17.0
 )
 
 require (

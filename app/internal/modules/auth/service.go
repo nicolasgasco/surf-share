@@ -36,7 +36,7 @@ func (s *AuthService) Register(ctx context.Context, username, email, password st
 		return nil, "", err
 	}
 
-	token, err := s.createJwtToken(user.ID)
+	token, err := s.createJwtToken(&user)
 	if err != nil {
 		return nil, "", err
 	}
@@ -52,11 +52,13 @@ func (s *AuthService) encryptPassword(password string) (string, error) {
 	return string(hash), nil
 }
 
-func (s *AuthService) createJwtToken(userId string) (string, error) {
+func (s *AuthService) createJwtToken(user *User) (string, error) {
 	claims := jwt.MapClaims{
-		"user_id": userId,
-		"iat":     time.Now(),
-		"exp":     time.Now().Add(time.Minute * 15).Unix(),
+		"id":       user.ID,
+		"username": user.Username,
+		"email":    user.Email,
+		"iat":      time.Now(),
+		"exp":      time.Now().Add(time.Minute * 15).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

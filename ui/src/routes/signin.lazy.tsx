@@ -1,5 +1,6 @@
-import {createLazyFileRoute} from '@tanstack/react-router'
+import {createLazyFileRoute, useRouter} from '@tanstack/react-router'
 import {type FormEvent, type MouseEvent, useState} from "react";
+import {useAuth} from '../contexts/AuthContext';
 
 export const Route = createLazyFileRoute('/signin')({
     component: RouteComponent,
@@ -7,6 +8,8 @@ export const Route = createLazyFileRoute('/signin')({
 
 function RouteComponent() {
     const [showSignUp, setShowSignUp] = useState(false);
+    const {login} = useAuth();
+    const {navigate} = useRouter()
 
     const handleToggleSignUp = (e: MouseEvent) => {
         e.preventDefault();
@@ -21,12 +24,14 @@ function RouteComponent() {
             body: new FormData(e.currentTarget),
         });
 
-        if (res.ok) {
-            setShowSignUp(false);
-            alert('Your account has been created successfully!');
-        } else {
+        if (!res.ok) {
             alert('Error signing up');
+            return;
         }
+
+        const {user, token} = await res.json();
+        login(user, token);
+        navigate({to: '/'});
     }
 
     return <>

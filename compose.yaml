@@ -26,6 +26,7 @@ services:
     entrypoint: [ 'sh', '/go/entrypoint.sh' ]
     secrets:
       - db_password
+      - jwt_secret
     environment:
       - DB_HOST=db
       - DB_HOST_TEST=db-test
@@ -33,6 +34,7 @@ services:
       - DB_PASSWORD_FILE=/run/secrets/db_password
       - DB_PORT=5432
       - DB_USER=postgres
+      - JWT_SECRET=/run/secrets/jwt_secret
       - PORT=8080
       - UI_PORT=5173
     command: sh -c "cd /go/app && go run main.go"
@@ -82,3 +84,5 @@ volumes:
 secrets:
   db_password:
     file: db/password
+  jwt_secret:
+    file: app/.jwt_secret

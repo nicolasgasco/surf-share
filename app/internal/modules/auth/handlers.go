@@ -2,7 +2,9 @@ package auth
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
+	"strings"
 	"surf-share/app/internal/adapters"
 )
 
@@ -26,6 +28,7 @@ func (h *AuthHandler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Email is required", http.StatusBadRequest)
 		return
 	}
+	lowercaseEmail := strings.ToLower(email)
 
 	password := r.FormValue("password")
 	if password == "" {
@@ -38,18 +41,29 @@ func (h *AuthHandler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var newUser User
 	ctx := context.Background()
-	err = h.dbAdapter.Exec(ctx,
-		"INSERT INTO app.users (username, email, password) VALUES ($1, $2, $3)",
-		username, email, hashedPassword)
+	err = h.dbAdapter.CreateOne(ctx, &newUser,
+		"INSERT INTO app.users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email",
+		username, lowercaseEmail, hashedPassword)
 	if err != nil {
 		http.Error(w, "Failed to register user", http.StatusBadRequest)
 		return
 	}
 
+	token, err := createJwtToken(newUser.ID)
+	if err != nil {
+		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	if _, err := w.Write([]byte("User registered")); err != nil {
-		http.Error(w, "Failed to write response", http.StatusInternalServerError)
+	if err := json.NewEncoder(w).Encode(map[string]interface{}{
+		"user":  newUser,
+		"token": token,
+	}); err != nil {
+		http.Error(w, "Failed to write response body", http.StatusInternalServerError)
 		return
 	}
 }

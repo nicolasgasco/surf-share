@@ -1,20 +1,18 @@
 package auth
 
-import (
-	"net/http"
-	"surf-share/app/internal/adapters"
-)
+import "net/http"
 
 type AuthModule struct {
-	dbAdapter *adapters.DatabaseAdapter
+	service *AuthService
 }
 
-func NewAuthModule(dbAdapter *adapters.DatabaseAdapter) *AuthModule {
-	return &AuthModule{dbAdapter: dbAdapter}
+func NewAuthModule(repo UserAuthRepository) *AuthModule {
+	service := NewAuthService(repo)
+	return &AuthModule{service: service}
 }
 
 func (m *AuthModule) Register(mux *http.ServeMux) {
-	authHandler := NewAuthHandler(m.dbAdapter)
+	authHandler := NewAuthHandler(m.service)
 
 	mux.HandleFunc("POST /auth/login", authHandler.HandleLogin)
 	mux.HandleFunc("POST /auth/register", authHandler.HandleRegister)

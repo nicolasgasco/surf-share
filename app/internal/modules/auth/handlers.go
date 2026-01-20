@@ -3,17 +3,15 @@ package auth
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"surf-share/app/internal/adapters"
 )
 
 type AuthHandler struct {
 	service *AuthService
 }
 
-func NewAuthHandler(dbAdapter *adapters.DatabaseAdapter) *AuthHandler {
-	return &AuthHandler{service: NewAuthService(dbAdapter)}
+func NewAuthHandler(service *AuthService) *AuthHandler {
+	return &AuthHandler{service: service}
 }
 
 func (h *AuthHandler) HandleRegister(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +64,6 @@ func (h *AuthHandler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	user, token, err := h.service.Login(ctx, email, password)
 	if err != nil {
-		fmt.Println(err)
 		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
 		return
 	}

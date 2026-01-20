@@ -6,18 +6,16 @@ import (
 	"strings"
 	"time"
 
-	"surf-share/app/internal/adapters"
-
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
-	dbAdapter *adapters.DatabaseAdapter
+	repo UserAuthRepository
 }
 
-func NewAuthService(dbAdapter *adapters.DatabaseAdapter) *AuthService {
-	return &AuthService{dbAdapter: dbAdapter}
+func NewAuthService(repo UserAuthRepository) *AuthService {
+	return &AuthService{repo: repo}
 }
 
 func (s *AuthService) Register(ctx context.Context, username, email, password string) (*User, string, error) {
@@ -28,29 +26,24 @@ func (s *AuthService) Register(ctx context.Context, username, email, password st
 		return nil, "", err
 	}
 
-	var user User
-	err = s.dbAdapter.CreateOne(ctx, &user,
-		"INSERT INTO app.users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email",
-		username, email, hashedPassword)
+	user, err := s.repo.CreateUser(ctx, username, email, hashedPassword)
 	if err != nil {
 		return nil, "", err
 	}
 
-	token, err := s.createJwtToken(&user)
+	token, err := s.createJwtToken(user)
 	if err != nil {
 		return nil, "", err
 	}
 
-	return &user, token, nil
+	return user, token, nil
 }
 
 func (s *AuthService) Login(ctx context.Context, email, password string) (*User, string, error) {
 	email = strings.ToLower(email)
 
-	var userCredentials UserCredentials
-	if err := s.dbAdapter.FindOne(ctx, &userCredentials,
-		"SELECT id, email, password FROM app.users WHERE email = $1",
-		email); err != nil {
+	userCredentials, err := s.repo.FindUserCredentialsByEmail(ctx, email)
+	if err != nil {
 		return nil, "", err
 	}
 
@@ -58,19 +51,17 @@ func (s *AuthService) Login(ctx context.Context, email, password string) (*User,
 		return nil, "", err
 	}
 
-	var user User
-	if err := s.dbAdapter.FindOne(ctx, &user,
-		"SELECT id, username, email FROM app.users WHERE email = $1",
-		email); err != nil {
-		return nil, "", err
-	}
-
-	token, err := s.createJwtToken(&user)
+	user, err := s.repo.FindUserByID(ctx, userCredentials.ID)
 	if err != nil {
 		return nil, "", err
 	}
 
-	return &user, token, nil
+	token, err := s.createJwtToken(user)
+	if err != nil {
+		return nil, "", err
+	}
+
+	return user, token, nil
 }
 
 func (s *AuthService) verifyPassword(hashedPassword, password string) error {

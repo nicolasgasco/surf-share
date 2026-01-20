@@ -16,6 +16,25 @@ function RouteComponent() {
         setShowSignUp(prev => !prev);
     }
 
+    const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const res = await fetch('http://localhost:8080/auth/login', {
+            method: 'POST',
+            body: new FormData(e.currentTarget),
+        });
+
+        console.log('res', res);
+        if (!res.ok) {
+            alert('Error logging in');
+            return;
+        }
+
+        const {user, token} = await res.json();
+        login(user, token);
+        navigate({to: '/'});
+    }
+
     const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -57,9 +76,11 @@ function RouteComponent() {
             </>
         ) : (
             <>
-                <form className="flex flex-col gap-4 w-full max-w-sm mb-4">
-                    <input type="email" placeholder="Email" className="p-2 border border-gray-300 rounded"/>
-                    <input type="password" placeholder="Password" className="p-2 border border-gray-300 rounded"/>
+                <form className="flex flex-col gap-4 w-full max-w-sm mb-4" onSubmit={handleLogin}>
+                    <input type="email" name="email" placeholder="Email"
+                           className="p-2 border border-gray-300 rounded"/>
+                    <input type="password" name="password" placeholder="Password"
+                           className="p-2 border border-gray-300 rounded"/>
                     <button type="submit"
                             className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition">
                         Log in

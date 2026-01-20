@@ -44,6 +44,39 @@ func (s *AuthService) Register(ctx context.Context, username, email, password st
 	return &user, token, nil
 }
 
+func (s *AuthService) Login(ctx context.Context, email, password string) (*User, string, error) {
+	email = strings.ToLower(email)
+
+	var userCredentials UserCredentials
+	if err := s.dbAdapter.FindOne(ctx, &userCredentials,
+		"SELECT id, email, password FROM app.users WHERE email = $1",
+		email); err != nil {
+		return nil, "", err
+	}
+
+	if err := s.verifyPassword(userCredentials.Password, password); err != nil {
+		return nil, "", err
+	}
+
+	var user User
+	if err := s.dbAdapter.FindOne(ctx, &user,
+		"SELECT id, username, email FROM app.users WHERE email = $1",
+		email); err != nil {
+		return nil, "", err
+	}
+
+	token, err := s.createJwtToken(&user)
+	if err != nil {
+		return nil, "", err
+	}
+
+	return &user, token, nil
+}
+
+func (s *AuthService) verifyPassword(hashedPassword, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+}
+
 func (s *AuthService) encryptPassword(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {

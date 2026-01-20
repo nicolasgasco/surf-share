@@ -15,5 +15,7 @@ func NewAuthModule(dbAdapter *adapters.DatabaseAdapter) *AuthModule {
 
 func (m *AuthModule) Register(mux *http.ServeMux) {
 	authHandler := NewAuthHandler(m.dbAdapter)
+
+	mux.HandleFunc("POST /auth/login", authHandler.HandleLogin)
 	mux.HandleFunc("POST /auth/register", authHandler.HandleRegister)
 }

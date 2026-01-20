@@ -3,4 +3,7 @@
 
 # Secrets
 /db/password
+/app/.jwt_secret
+
+# Temp files
 /app/tmp/

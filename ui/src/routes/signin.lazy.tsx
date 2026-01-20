@@ -7,6 +7,7 @@ export const Route = createLazyFileRoute('/signin')({
 })
 
 function RouteComponent() {
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [showSignUp, setShowSignUp] = useState(false);
     const {login} = useAuth();
     const {navigate} = useRouter()
@@ -24,14 +25,15 @@ function RouteComponent() {
             body: new FormData(e.currentTarget),
         });
 
-        console.log('res', res);
+
         if (!res.ok) {
-            alert('Error logging in');
+            setErrorMessage("Invalid email or password");
             return;
         }
 
         const {user, token} = await res.json();
         login(user, token);
+        setErrorMessage(null)
         navigate({to: '/'});
     }
 
@@ -44,51 +46,67 @@ function RouteComponent() {
         });
 
         if (!res.ok) {
-            alert('Error signing up');
+            setErrorMessage("Failed to create account. Please try again.");
             return;
         }
 
         const {user, token} = await res.json();
         login(user, token);
+        setErrorMessage(null)
         navigate({to: '/'});
+    }
+
+    const handleOnChange = () => {
+        if (errorMessage) {
+            setErrorMessage(null);
+        }
     }
 
     return <>
         <h1 className="mb-8">Welcome back!</h1>
 
         {showSignUp ? (
-            <>
-                <form className="flex flex-col gap-4 w-full max-w-sm mb-4" onSubmit={handleSignUp}>
-                    <input type="text" placeholder="Username" className="p-2 border border-gray-300 rounded"
-                           name="username"/>
-                    <input type="email" placeholder="Email" className="p-2 border border-gray-300 rounded"
-                           name="email"/>
-                    <input type="password" placeholder="Password" className="p-2 border border-gray-300 rounded"
-                           name="password"/>
+                <>
+                    <form className="flex flex-col gap-4 w-full max-w-sm mb-4" onSubmit={handleSignUp}
+                          onChange={handleOnChange}>
+                        <input type="text" placeholder="Username" className="p-2 border border-gray-300 rounded"
+                               name="username" required/>
+                        <input type="email" placeholder="Email" className="p-2 border border-gray-300 rounded"
+                               name="email" required/>
+                        <input type="password" placeholder="Password" className="p-2 border border-gray-300 rounded"
+                               name="password" required/>
 
-                    <button type="submit"
-                            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition">
-                        Create account
-                    </button>
-                </form>
+                        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+                        <button type="submit"
+                                className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition">
+                            Create account
+                        </button>
+                    </form>
 
-                <p>Already have an account? <a onClick={handleToggleSignUp}>Log in</a></p>
-            </>
-        ) : (
-            <>
-                <form className="flex flex-col gap-4 w-full max-w-sm mb-4" onSubmit={handleLogin}>
-                    <input type="email" name="email" placeholder="Email"
-                           className="p-2 border border-gray-300 rounded"/>
-                    <input type="password" name="password" placeholder="Password"
-                           className="p-2 border border-gray-300 rounded"/>
-                    <button type="submit"
-                            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition">
-                        Log in
-                    </button>
-                </form>
-                <p>Don't have an account yet? <a onClick={handleToggleSignUp}>Create a new account</a>
-                </p>
-            </>
-        )}
+                    <p>Already have an account? <a onClick={handleToggleSignUp}>Log in</a>
+                    </p>
+                </>
+            ) :
+            (
+                <>
+                    <form className="flex flex-col gap-4 w-full max-w-sm mb-4" onSubmit={handleLogin}
+                          onChange={handleOnChange}>
+                        <input type="email" name="email" placeholder="Email"
+                               className="p-2 border border-gray-300 rounded" required/>
+                        <input type="password" name="password" placeholder="Password"
+                               className="p-2 border border-gray-300 rounded" required/>
+
+                        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+                        <button type="submit"
+                                className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition">
+                            Log in
+                        </button>
+                    </form>
+                    <p>Don't have an account yet? <a onClick={handleToggleSignUp}>Create a new account</a>
+                    </p>
+                </>
+            )
+        }
+
     </>
 }

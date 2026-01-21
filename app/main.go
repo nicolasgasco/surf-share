@@ -29,11 +29,8 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	breaksModule := breaks.NewBreaksModule(&dbAdapter)
-	breaksModule.Register(mux)
-
-	authModule := auth.NewAuthModule(&dbAdapter)
-	authModule.Register(mux)
+	breaks.NewBreaksModule(&dbAdapter).Register(mux)
+	auth.NewAuthModule(&dbAdapter).Register(mux)
 
 	mux.HandleFunc("GET /", handlers.HandleRoot)
 

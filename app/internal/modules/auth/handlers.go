@@ -4,10 +4,33 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"os"
+	"surf-share/app/internal/adapters"
+	authAdapters "surf-share/app/internal/modules/auth/adapters"
 )
+
+type AuthModule struct {
+	service *AuthService
+}
 
 type AuthHandler struct {
 	service *AuthService
+}
+
+func NewAuthModule(dbAdapter *adapters.DatabaseAdapter) *AuthModule {
+	userRepository := authAdapters.NewUserRepository(dbAdapter)
+	passwordHasher := authAdapters.NewBcryptHasher()
+	jwtSecret := []byte(os.Getenv("JWT_SECRET"))
+	tokenGenerator := authAdapters.NewJWTGenerator(jwtSecret)
+	authService := NewAuthService(userRepository, passwordHasher, tokenGenerator)
+
+	return &AuthModule{service: authService}
+}
+
+func (m *AuthModule) Register(mux *http.ServeMux) {
+	handler := NewAuthHandler(m.service)
+	mux.HandleFunc("POST /auth/login", handler.HandleLogin)
+	mux.HandleFunc("POST /auth/register", handler.HandleRegister)
 }
 
 func NewAuthHandler(service *AuthService) *AuthHandler {

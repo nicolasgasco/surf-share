@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"surf-share/app/internal/adapters"
-	"surf-share/app/internal/modules/auth"
 )
 
 type UserRepository struct {
@@ -15,8 +14,8 @@ func NewUserRepository(db *adapters.DatabaseAdapter) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (r *UserRepository) FindUserCredentialsByEmail(ctx context.Context, email string) (*auth.UserCredentials, error) {
-	var userCredentials auth.UserCredentials
+func (r *UserRepository) FindUserCredentialsByEmail(ctx context.Context, email string) (*UserCredentials, error) {
+	var userCredentials UserCredentials
 	if err := r.db.FindOne(ctx, &userCredentials,
 		"SELECT id, username, email, password FROM app.users WHERE email = $1",
 		email); err != nil {
@@ -25,8 +24,8 @@ func (r *UserRepository) FindUserCredentialsByEmail(ctx context.Context, email s
 	return &userCredentials, nil
 }
 
-func (r *UserRepository) FindUserByID(ctx context.Context, id string) (*auth.User, error) {
-	var user auth.User
+func (r *UserRepository) FindUserByID(ctx context.Context, id string) (*User, error) {
+	var user User
 	if err := r.db.FindOne(ctx, &user,
 		"SELECT id, username, email FROM app.users WHERE id = $1",
 		id); err != nil {
@@ -35,8 +34,8 @@ func (r *UserRepository) FindUserByID(ctx context.Context, id string) (*auth.Use
 	return &user, nil
 }
 
-func (r *UserRepository) CreateUser(ctx context.Context, username, email, hashedPassword string) (*auth.User, error) {
-	var user auth.User
+func (r *UserRepository) CreateUser(ctx context.Context, username, email, hashedPassword string) (*User, error) {
+	var user User
 	if err := r.db.CreateOne(ctx, &user,
 		"INSERT INTO app.users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email",
 		username, email, hashedPassword); err != nil {

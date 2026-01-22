@@ -1,11 +1,15 @@
 package auth
 
-import "context"
+import (
+	"context"
+
+	"surf-share/app/internal/modules/auth/adapters"
+)
 
 type UserAuthRepository interface {
-	FindUserCredentialsByEmail(ctx context.Context, email string) (*UserCredentials, error)
-	FindUserByID(ctx context.Context, id string) (*User, error)
-	CreateUser(ctx context.Context, username, email, hashedPassword string) (*User, error)
+	FindUserCredentialsByEmail(ctx context.Context, email string) (*adapters.UserCredentials, error)
+	FindUserByID(ctx context.Context, id string) (*adapters.User, error)
+	CreateUser(ctx context.Context, username, email, hashedPassword string) (*adapters.User, error)
 }
 
 type PasswordHasher interface {
@@ -14,5 +18,5 @@ type PasswordHasher interface {
 }
 
 type TokenGenerator interface {
-	Generate(user *User) (string, error)
+	Generate(user *adapters.User) (string, error)
 }

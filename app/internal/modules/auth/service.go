@@ -3,6 +3,8 @@ package auth
 import (
 	"context"
 	"strings"
+
+	"surf-share/app/internal/modules/auth/adapters"
 )
 
 type AuthService struct {
@@ -19,7 +21,7 @@ func NewAuthService(repo UserAuthRepository, hasher PasswordHasher, generator To
 	}
 }
 
-func (s *AuthService) Register(ctx context.Context, username, email, password string) (*User, string, error) {
+func (s *AuthService) Register(ctx context.Context, username, email, password string) (*adapters.User, string, error) {
 	email = strings.ToLower(email)
 
 	hashedPassword, err := s.passwordHasher.Hash(password)
@@ -40,7 +42,7 @@ func (s *AuthService) Register(ctx context.Context, username, email, password st
 	return user, token, nil
 }
 
-func (s *AuthService) Login(ctx context.Context, email, password string) (*User, string, error) {
+func (s *AuthService) Login(ctx context.Context, email, password string) (*adapters.User, string, error) {
 	email = strings.ToLower(email)
 
 	userCredentials, err := s.repo.FindUserCredentialsByEmail(ctx, email)

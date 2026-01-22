@@ -4,8 +4,19 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"surf-share/app/internal/modules/auth"
 )
+
+type User struct {
+	ID       string `db:"id" json:"id"`
+	Username string `db:"username" json:"username"`
+	Email    string `db:"email" json:"email"`
+}
+
+type UserCredentials struct {
+	ID       string `db:"id"`
+	Email    string `db:"email"`
+	Password string `db:"password"`
+}
 
 type JWTGenerator struct {
 	secret []byte
@@ -15,7 +26,7 @@ func NewJWTGenerator(secret []byte) *JWTGenerator {
 	return &JWTGenerator{secret: secret}
 }
 
-func (j *JWTGenerator) Generate(user *auth.User) (string, error) {
+func (j *JWTGenerator) Generate(user *User) (string, error) {
 	claims := jwt.MapClaims{
 		"id":       user.ID,
 		"username": user.Username,

@@ -30,7 +30,15 @@ func main() {
 	mux := http.NewServeMux()
 
 	breaks.NewBreaksModule(&dbAdapter).Register(mux)
-	auth.NewAuthModule(&dbAdapter).Register(mux)
+
+	userRepository := auth.NewRepository(&dbAdapter)
+	passwordHasher := auth.NewBcryptHasher()
+	jwtSecret := []byte(os.Getenv("JWT_SECRET"))
+	tokenGenerator := auth.NewJWTGenerator(jwtSecret)
+	authService := auth.NewAuthService(userRepository, passwordHasher, tokenGenerator)
+	httpHandler := auth.NewHTTPHandler(authService)
+	mux.HandleFunc("POST /auth/register", httpHandler.HandleRegister)
+	mux.HandleFunc("POST /auth/login", httpHandler.HandleLogin)
 
 	mux.HandleFunc("GET /", handlers.HandleRoot)
 

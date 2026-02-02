@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"surf-share/app/internal/adapters"
-	"surf-share/app/internal/models"
 	"surf-share/app/internal/modules/breaks"
 
 	"github.com/stretchr/testify/assert"
@@ -132,7 +131,9 @@ func (s *BreaksTestSuite) TestGetBreakByInvalidSlug() {
 	assert.Equal(s.T(), http.StatusNotFound, resp.StatusCode)
 	assert.Equal(s.T(), "application/json", resp.Header.Get("Content-Type"))
 
-	var errorResponse models.ErrorResponse
+	var errorResponse struct {
+		Message string `json:"message"`
+	}
 
 	err = json.NewDecoder(resp.Body).Decode(&errorResponse)
 	require.NoError(s.T(), err)

@@ -33,9 +33,11 @@ func (s *BreaksTestSuite) SetupTest() {
 	require.NoError(s.T(), err)
 
 	mux := http.NewServeMux()
-	breaksHandler := breaks.NewBreaksHandler(s.dbAdapter)
-	mux.HandleFunc("GET /breaks", breaksHandler.HandleBreaks)
-	mux.HandleFunc("GET /breaks/{slug}", breaksHandler.HandleBreakBySlug)
+	repo := breaks.NewRepository(s.dbAdapter)
+	service := breaks.NewBreaksService(repo)
+	handler := breaks.NewHTTPHandler(service)
+	mux.HandleFunc("GET /breaks", handler.HandleBreaks)
+	mux.HandleFunc("GET /breaks/{slug}", handler.HandleBreakBySlug)
 
 	s.server = httptest.NewServer(mux)
 }
@@ -59,8 +61,12 @@ func (s *BreaksTestSuite) TestGetBreaks() {
 	assert.Equal(s.T(), "application/json", resp.Header.Get("Content-Type"))
 
 	var response struct {
-		Count  int                     `json:"count"`
-		Breaks []breaks.BreaksResponse `json:"breaks"`
+		Count  int `json:"count"`
+		Breaks []struct {
+			ID   string `json:"id"`
+			Name string `json:"name"`
+			Slug string `json:"slug"`
+		} `json:"breaks"`
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&response)
@@ -80,7 +86,11 @@ func (s *BreaksTestSuite) TestGetBreakBySlug() {
 	defer resp.Body.Close()
 
 	var response struct {
-		Breaks []breaks.BreaksResponse `json:"breaks"`
+		Breaks []struct {
+			ID   string `json:"id"`
+			Name string `json:"name"`
+			Slug string `json:"slug"`
+		} `json:"breaks"`
 	}
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	require.NoError(s.T(), err)
@@ -95,7 +105,18 @@ func (s *BreaksTestSuite) TestGetBreakBySlug() {
 	assert.Equal(s.T(), http.StatusOK, resp.StatusCode)
 	assert.Equal(s.T(), "application/json", resp.Header.Get("Content-Type"))
 
-	var breakResponse breaks.BreakResponse
+	var breakResponse struct {
+		ID          string      `json:"id"`
+		Name        string      `json:"name"`
+		Slug        string      `json:"slug"`
+		Description string      `json:"description"`
+		Coordinates interface{} `json:"coordinates"`
+		Country     string      `json:"country"`
+		Region      string      `json:"region"`
+		City        string      `json:"city"`
+		VideoUrl    string      `json:"video_url"`
+		ImageUrls   []string    `json:"image_urls"`
+	}
 	err = json.NewDecoder(resp.Body).Decode(&breakResponse)
 	require.NoError(s.T(), err)
 

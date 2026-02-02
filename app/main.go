@@ -29,7 +29,11 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	breaks.NewBreaksModule(&dbAdapter).Register(mux)
+	breaksRepository := breaks.NewRepository(&dbAdapter)
+	breaksService := breaks.NewBreaksService(breaksRepository)
+	breaksHandler := breaks.NewHTTPHandler(breaksService)
+	mux.HandleFunc("GET /breaks", breaksHandler.HandleBreaks)
+	mux.HandleFunc("GET /breaks/{slug}", breaksHandler.HandleBreakBySlug)
 
 	userRepository := auth.NewRepository(&dbAdapter)
 	passwordHasher := auth.NewBcryptHasher()

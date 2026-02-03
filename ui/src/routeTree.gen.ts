@@ -13,6 +13,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRouteImport } from './routes/__root'
 
 const SigninLazyRouteImport = createFileRoute('/signin')()
+const BreaksLazyRouteImport = createFileRoute('/breaks')()
 const IndexLazyRouteImport = createFileRoute('/')()
 const BreaksBreakSlugLazyRouteImport = createFileRoute('/breaks/$breakSlug')()
 
@@ -21,47 +22,55 @@ const SigninLazyRoute = SigninLazyRouteImport.update({
   path: '/signin',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/signin.lazy').then((d) => d.Route))
+const BreaksLazyRoute = BreaksLazyRouteImport.update({
+  id: '/breaks',
+  path: '/breaks',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/breaks.lazy').then((d) => d.Route))
 const IndexLazyRoute = IndexLazyRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
 const BreaksBreakSlugLazyRoute = BreaksBreakSlugLazyRouteImport.update({
-  id: '/breaks/$breakSlug',
-  path: '/breaks/$breakSlug',
-  getParentRoute: () => rootRouteImport,
+  id: '/$breakSlug',
+  path: '/$breakSlug',
+  getParentRoute: () => BreaksLazyRoute,
 } as any).lazy(() =>
   import('./routes/breaks.$breakSlug.lazy').then((d) => d.Route),
 )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
+  '/breaks': typeof BreaksLazyRouteWithChildren
   '/signin': typeof SigninLazyRoute
   '/breaks/$breakSlug': typeof BreaksBreakSlugLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/breaks': typeof BreaksLazyRouteWithChildren
   '/signin': typeof SigninLazyRoute
   '/breaks/$breakSlug': typeof BreaksBreakSlugLazyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexLazyRoute
+  '/breaks': typeof BreaksLazyRouteWithChildren
   '/signin': typeof SigninLazyRoute
   '/breaks/$breakSlug': typeof BreaksBreakSlugLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/signin' | '/breaks/$breakSlug'
+  fullPaths: '/' | '/breaks' | '/signin' | '/breaks/$breakSlug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/signin' | '/breaks/$breakSlug'
-  id: '__root__' | '/' | '/signin' | '/breaks/$breakSlug'
+  to: '/' | '/breaks' | '/signin' | '/breaks/$breakSlug'
+  id: '__root__' | '/' | '/breaks' | '/signin' | '/breaks/$breakSlug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
+  BreaksLazyRoute: typeof BreaksLazyRouteWithChildren
   SigninLazyRoute: typeof SigninLazyRoute
-  BreaksBreakSlugLazyRoute: typeof BreaksBreakSlugLazyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -73,6 +82,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SigninLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/breaks': {
+      id: '/breaks'
+      path: '/breaks'
+      fullPath: '/breaks'
+      preLoaderRoute: typeof BreaksLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -82,18 +98,30 @@ declare module '@tanstack/react-router' {
     }
     '/breaks/$breakSlug': {
       id: '/breaks/$breakSlug'
-      path: '/breaks/$breakSlug'
+      path: '/$breakSlug'
       fullPath: '/breaks/$breakSlug'
       preLoaderRoute: typeof BreaksBreakSlugLazyRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof BreaksLazyRoute
     }
   }
 }
 
+interface BreaksLazyRouteChildren {
+  BreaksBreakSlugLazyRoute: typeof BreaksBreakSlugLazyRoute
+}
+
+const BreaksLazyRouteChildren: BreaksLazyRouteChildren = {
+  BreaksBreakSlugLazyRoute: BreaksBreakSlugLazyRoute,
+}
+
+const BreaksLazyRouteWithChildren = BreaksLazyRoute._addFileChildren(
+  BreaksLazyRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
+  BreaksLazyRoute: BreaksLazyRouteWithChildren,
   SigninLazyRoute: SigninLazyRoute,
-  BreaksBreakSlugLazyRoute: BreaksBreakSlugLazyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

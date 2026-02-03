@@ -36,6 +36,13 @@ function RouteComponent() {
             <h1 className="mb-4 title-1">Your break info for {name} ({region}, {country})</h1>
             <p className="mb-6 text-sm">{description}</p>
 
+            {forecastData && (
+                <section className="w-full">
+                    <h2 className="mb-4 title-2">Forecast (3 days)</h2>
+                    <ForecastTable hourlyData={hourlyData}/>
+                </section>
+            )}
+
             <section className="mb-12">
                 <h2 className="mb-4 title-2">Webcam</h2>
 
@@ -44,12 +51,7 @@ function RouteComponent() {
                 {imageUrls && imageUrls.length > 0 && <WebcamGrid imageUrls={imageUrls} name={name}/>}
 
             </section>
-            {forecastData && (
-                <section className="w-full">
-                    <h2 className="mb-4 title-2">Forecast (3 days)</h2>
-                    <ForecastTable hourlyData={hourlyData}/>
-                </section>
-            )}
+
         </div>
     )
 }

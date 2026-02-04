@@ -24,7 +24,7 @@ function RouteComponent() {
 
     if (!breakData || !forecastData) {
         return <div>
-            <h1>Something went wrong. Please try again later.</h1>
+            <h1 className="title-1">Something went wrong. Please try again later.</h1>
         </div>
     }
 

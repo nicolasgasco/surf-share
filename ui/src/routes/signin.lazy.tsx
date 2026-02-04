@@ -63,7 +63,7 @@ function RouteComponent() {
     }
 
     return <>
-        <h1 className="mb-8">Welcome back!</h1>
+        <h1 className="mb-8 title-1">Welcome back!</h1>
 
         {showSignUp ? (
                 <>

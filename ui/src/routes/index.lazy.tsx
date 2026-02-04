@@ -18,7 +18,7 @@ function RouteComponent() {
 
     return (
         <>
-            <h1 className="mb-4">Welcome to SurfShare</h1>
+            <h1 className="mb-4 title-1">Welcome to SurfShare</h1>
             <p className="mb-6">Start by choosing one of the surf breaks below to find more about them.</p>
 
             <select name="breaks"

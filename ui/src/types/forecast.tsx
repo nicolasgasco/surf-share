@@ -5,6 +5,9 @@ export interface HourlyForecast {
     waveDirection: number[];
     seaSurfaceTemperature: number[];
     seaLevelHeightMsl: number[];
+    temperature2m: number[];
+    windSpeed10m: number[];
+    windDirection10m: number[];
 }
 
 export interface Forecast {

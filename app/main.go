@@ -8,7 +8,6 @@ import (
 	"surf-share/app/config"
 	"surf-share/app/internal/adapters"
 	"surf-share/app/internal/handlers"
-	"surf-share/app/internal/middleware"
 	"surf-share/app/internal/modules/auth"
 	"surf-share/app/internal/modules/breaks"
 	"surf-share/app/internal/modules/forecast"
@@ -56,11 +55,9 @@ func main() {
 
 	mux.HandleFunc("GET /", handlers.HandleRoot)
 
-	handler := middleware.CORS(mux)
-
 	port := os.Getenv("PORT")
 	fmt.Printf("Server is listening to port %s\n", port)
-	if err := http.ListenAndServe(":"+port, handler); err != nil {
+	if err := http.ListenAndServe(":"+port, mux); err != nil {
 		fmt.Println("Error starting application")
 	}
 }

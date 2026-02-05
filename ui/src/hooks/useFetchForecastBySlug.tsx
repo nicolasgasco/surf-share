@@ -17,7 +17,7 @@ export function useFetchForecastBySlug(slug: string): {
             setError(null);
 
             try {
-                const response = await fetch(`http://localhost:8080/forecast/${slug}`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/forecast/${slug}`);
 
                 if (!response.ok) {
                     const errorMsg = `Failed to fetch forecast: ${response.statusText}`;

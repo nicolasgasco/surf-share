@@ -1,0 +1,55 @@
+{
+  "name": "Surf Share API",
+  "api_id": "surf-share",
+  "org_id": "default",
+  "definition": {
+    "location": "header",
+    "key": "x-api-key"
+  },
+  "auth": {
+    "auth_header_name": "authorization"
+  },
+  "version_data": {
+    "not_versioned": true,
+    "versions": {
+      "Default": {
+        "name": "Default",
+        "use_extended_paths": true
+      }
+    }
+  },
+  "proxy": {
+    "listen_path": "/api/",
+    "target_url": "http://app:8080/",
+    "strip_listen_path": true
+  },
+  "CORS": {
+    "enable": true,
+    "allowed_origins": [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173"
+    ],
+    "allowed_methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "OPTIONS"
+    ],
+    "allowed_headers": [
+      "Accept",
+      "Content-Type",
+      "Content-Length",
+      "Accept-Encoding",
+      "X-CSRF-Token",
+      "Authorization",
+      "X-Requested-With"
+    ],
+    "allow_credentials": true,
+    "options_passthrough": false,
+    "debug_allow_all_origins": false
+  },
+  "use_keyless": true,
+  "active": true
+}
+

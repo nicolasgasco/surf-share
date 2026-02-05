@@ -77,6 +77,24 @@ services:
       - POSTGRES_DB=surf-share
       - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
 
+  redis:
+    image: redis:7-alpine
+    restart: always
+
+  tyk-gateway:
+    image: tykio/tyk-gateway:latest
+    restart: always
+    ports:
+      - "8088:8088"
+    depends_on:
+      redis:
+        condition: service_started
+      app:
+        condition: service_healthy
+    volumes:
+      - ./tyk/tyk.conf:/opt/tyk-gateway/tyk.conf:ro
+      - ./tyk/apps:/opt/tyk-gateway/apps:ro
+
 volumes:
   db_data:
   db_test_data:

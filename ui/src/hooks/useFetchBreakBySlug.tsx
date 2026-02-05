@@ -9,7 +9,7 @@ export function useFetchBreakBySlug(slug: string): { data: Break | null, isLoadi
     useEffect(() => {
         async function fetchBreak() {
             setIsLoading(true);
-            const response = await fetch(`http://localhost:8080/breaks/${slug}`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/breaks/${slug}`);
 
             if (!response.ok) {
                 console.error('Failed to fetch break:', response.statusText);

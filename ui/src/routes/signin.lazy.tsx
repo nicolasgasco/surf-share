@@ -20,7 +20,7 @@ function RouteComponent() {
     const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const res = await fetch('http://localhost:8080/auth/login', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
             method: 'POST',
             body: new FormData(e.currentTarget),
         });
@@ -40,7 +40,7 @@ function RouteComponent() {
     const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const res = await fetch('http://localhost:8080/auth/register', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
             method: 'POST',
             body: new FormData(e.currentTarget),
         });

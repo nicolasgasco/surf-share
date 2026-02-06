@@ -94,6 +94,7 @@ services:
     volumes:
       - ./tyk/tyk.conf:/opt/tyk-gateway/tyk.conf:ro
       - ./tyk/apps:/opt/tyk-gateway/apps:ro
+      - ./tyk/certs:/opt/tyk-gateway/certs:ro
 
 volumes:
   db_data:

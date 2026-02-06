@@ -7,3 +7,6 @@
 
 # Temp files
 /app/tmp/
+
+# Tyk Certificates
+/tyk/certs/*.pem

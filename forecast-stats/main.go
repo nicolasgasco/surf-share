@@ -40,7 +40,8 @@ func main() {
 	})
 
 	openMeteoClient := internal.NewOpenMeteoClient()
-	statsService := internal.NewStatsService(openMeteoClient)
+	breaksClient := internal.NewBreaksClient()
+	statsService := internal.NewStatsService(openMeteoClient, breaksClient)
 	statsHandler := internal.NewHTTPHandler(statsService)
 	mux.HandleFunc("GET /forecast/stats/{slug}", statsHandler.HandleStats)
 

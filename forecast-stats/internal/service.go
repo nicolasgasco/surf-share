@@ -44,20 +44,26 @@ type StatsService interface {
 	GetStats(ctx context.Context, slug string) (*Stats, error)
 }
 
-func NewStatsService(openMeteoClient *OpenMeteoClient) StatsService {
+func NewStatsService(openMeteoClient *OpenMeteoClient, breaksClient *BreaksClient) StatsService {
 	return &statsService{
 		openMeteoClient: openMeteoClient,
+		breaksClient:    breaksClient,
 	}
 }
 
 type statsService struct {
 	openMeteoClient *OpenMeteoClient
+	breaksClient    *BreaksClient
 }
 
 func (s *statsService) GetStats(ctx context.Context, slug string) (*Stats, error) {
-	// TODO: Hardcoded coordinates for now - will be improved later
-	latitude := 43.458336
-	longitude := -3.1249847
+	brk, err := s.breaksClient.GetBreakBySlug(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
+
+	latitude := brk.Coordinates.Y
+	longitude := brk.Coordinates.X
 
 	forecast, err := s.openMeteoClient.GetMarineForecast(ctx, latitude, longitude)
 	if err != nil {

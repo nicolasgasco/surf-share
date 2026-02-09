@@ -58,6 +58,7 @@ services:
     entrypoint: [ 'sh', '/go/entrypoint.sh' ]
     environment:
       - PORT=8081
+      - APP_SERVICE_URL=http://app:8080
     command: sh -c "cd /go/app && go run main.go"
     healthcheck:
       test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8081" ]

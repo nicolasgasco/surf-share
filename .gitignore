@@ -12,3 +12,4 @@
 /tyk/certs/*.pem
 /forecast-stats/tmp/main
 /forecast-stats/tmp/build-errors.log
+/forecast-stats/forecast-stats

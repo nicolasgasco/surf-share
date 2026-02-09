@@ -54,6 +54,7 @@ func main() {
 	mux.HandleFunc("GET /forecast/{slug}", forecastHandler.HandleWeeklyForecast)
 
 	mux.HandleFunc("GET /", handlers.HandleRoot)
+	mux.HandleFunc("GET /health", handlers.HandleHealth)
 
 	port := os.Getenv("PORT")
 	fmt.Printf("Server is listening to port %s\n", port)

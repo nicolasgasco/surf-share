@@ -10,13 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@heroui/accordion": "^2.2.27",
+    "@heroui/system": "^2.4.26",
+    "@heroui/theme": "^2.4.26",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-router": "^1.144.0",
     "camelize": "^1.0.1",
+    "framer-motion": "^12.34.0",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {

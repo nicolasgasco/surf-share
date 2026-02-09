@@ -10,8 +10,16 @@ export interface HourlyForecast {
     windDirection10m: number[];
 }
 
+export interface DailyForecast {
+    time: string[];
+    waveHeightMax: number[];
+    waveDirectionDominant: number[];
+    wavePeriodMax: number[];
+}
+
 export interface Forecast {
     latitude: number;
     longitude: number;
     hourly: HourlyForecast;
+    daily: DailyForecast;
 }

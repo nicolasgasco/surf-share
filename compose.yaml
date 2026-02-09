@@ -44,6 +44,27 @@ services:
       timeout: 5s
       retries: 10
 
+  forecast-stats:
+    image: golang:1.25-alpine
+    restart: always
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./forecast-stats:/go/app:rw
+      - ./docker/forecast_stats_entrypoint.sh:/go/entrypoint.sh:ro
+    entrypoint: [ 'sh', '/go/entrypoint.sh' ]
+    environment:
+      - PORT=8081
+    command: sh -c "cd /go/app && go run main.go"
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8081" ]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
   db:
     image: postgres:18-alpine
     restart: always

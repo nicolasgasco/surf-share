@@ -10,3 +10,4 @@
 
 # Tyk Certificates
 /tyk/certs/*.pem
+/forecast-stats/tmp/main

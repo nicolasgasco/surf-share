@@ -103,7 +103,7 @@ services:
     restart: always
 
   tyk-gateway:
-    image: tykio/tyk-gateway:latest
+    image: tykio/tyk-gateway:v5.12.0-alpha5
     restart: always
     ports:
       - "8088:8088"

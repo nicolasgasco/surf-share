@@ -1,6 +1,6 @@
 {
-  "name": "Surf Share API",
-  "api_id": "surf-share",
+  "name": "Forecast Stats API",
+  "api_id": "forecast-stats",
   "org_id": "default",
   "definition": {
     "location": "header",
@@ -19,8 +19,8 @@
     }
   },
   "proxy": {
-    "listen_path": "/api",
-    "target_url": "http://app:8080",
+    "listen_path": "/api/forecast/stats",
+    "target_url": "http://forecast-stats:8081/forecast/stats",
     "strip_listen_path": true
   },
   "CORS": {
@@ -30,11 +30,7 @@
       "http://127.0.0.1:5173"
     ],
     "allowed_methods": [
-      "GET",
-      "POST",
-      "PUT",
-      "DELETE",
-      "OPTIONS"
+      "GET"
     ],
     "allowed_headers": [
       "Accept",
@@ -56,4 +52,3 @@
   },
   "active": true
 }
-

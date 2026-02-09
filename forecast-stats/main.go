@@ -5,17 +5,24 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"forecast-stats/internal"
 )
 
 func main() {
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8081"
+	}
 
 	tmpl, err := template.ParseFiles("templates/root.html")
 	if err != nil {
 		log.Fatalf("Error parsing template: %v", err)
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
 			return
@@ -27,18 +34,18 @@ func main() {
 		}
 	})
 
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
 	})
 
-	http.HandleFunc("/stats", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"status":"ok","message":"forecast-stats service"}`))
-	})
+	openMeteoClient := internal.NewOpenMeteoClient()
+	statsService := internal.NewStatsService(openMeteoClient)
+	statsHandler := internal.NewHTTPHandler(statsService)
+	mux.HandleFunc("GET /forecast/stats/{slug}", statsHandler.HandleStats)
 
 	log.Printf("Starting forecast-stats service on port %s...", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
+	if err := http.ListenAndServe(":"+port, mux); err != nil {
 		log.Fatalf("Server error: %v", err)
 	}
 }

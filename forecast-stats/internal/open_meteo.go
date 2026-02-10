@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 type OpenMeteoClient struct {
@@ -57,10 +58,12 @@ type MarineForecast struct {
 }
 
 func (c *OpenMeteoClient) GetMarineForecast(ctx context.Context, latitude, longitude float64) (*MarineForecast, error) {
-	includedParameters := "wave_height,wave_direction,wave_period,sea_level_height_msl,sea_surface_temperature"
-	url := fmt.Sprintf("%s?latitude=%.4f&longitude=%.4f&daily=wave_height_max,wave_direction_dominant,wave_period_max&hourly=%s&timezone=Europe%%2FBerlin&past_days=92&forecast_days=1",
-		c.marineBaseURL, latitude, longitude, includedParameters)
+	yesterdayFormatted := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
+	oneYearAgo := time.Now().AddDate(-1, 0, 0).Format("2006-01-02")
 
+	includedParameters := "wave_height,wave_direction,wave_period,sea_level_height_msl,sea_surface_temperature"
+	url := fmt.Sprintf("%s?latitude=%.4f&longitude=%.4f&daily=wave_height_max,wave_direction_dominant,wave_period_max&hourly=%s&timezone=Europe%%2FBerlin&start_date=%s&end_date=%s",
+		c.marineBaseURL, latitude, longitude, includedParameters, oneYearAgo, yesterdayFormatted)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err

@@ -34,7 +34,7 @@ function RouteComponent() {
     const {description, imageUrls, name, region, country, videoUrl} = breakData;
     const {hourly: hourlyData} = forecastData;
     const {hourly: hourlyStats, daily: dailyStats} = statsdata;
-    console.log('statsdata', statsdata);
+
     const highestWaves = dailyStats.waveHeightMax.sort((a, b) => b - a).map((waveHeight, index) => {
         const date = dailyStats.time[index];
         return {height: waveHeight, date};
@@ -72,7 +72,7 @@ function RouteComponent() {
                 )}
 
                 {statsdata && (
-                    <AccordionItem key="3" aria-label="Stats (last 3 months)" title="Stats (last 3 months)">
+                    <AccordionItem key="3" aria-label="Stats (last 12 months)" title="Stats (last 12 months)">
                         <dl className="py-4 flex flex-col gap-2 w-full">
                             <dt className="font-bold">Highest waves:</dt>
                             <dd className="mb-2">

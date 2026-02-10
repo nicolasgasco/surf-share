@@ -7,6 +7,13 @@ export interface HourlyStats {
     seaLevelHeightMsl: number[];
 }
 
+export interface DailyStats {
+    time: string[];
+    waveHeightMax: number[];
+    waveDirectionDominant: number[];
+    wavePeriodMax: number[];
+}
+
 export interface ForecastStats {
     latitude: number;
     longitude: number;
@@ -28,10 +35,5 @@ export interface ForecastStats {
         wavePeriodMax: string;
     };
     hourly: HourlyStats;
-    daily: {
-        time: string[];
-        waveHeightMax: number[];
-        waveDirectionDominant: number[];
-        wavePeriodMax: number[];
-    };
+    daily: DailyStats;
 }

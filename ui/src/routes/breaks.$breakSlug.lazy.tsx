@@ -34,7 +34,20 @@ function RouteComponent() {
     const {description, imageUrls, name, region, country, videoUrl} = breakData;
     const {hourly: hourlyData} = forecastData;
     const {hourly: hourlyStats, daily: dailyStats} = statsdata;
-    console.log('Stats data:', hourlyStats, dailyStats);
+    console.log('statsdata', statsdata);
+    const highestWaves = dailyStats.waveHeightMax.sort((a, b) => b - a).map((waveHeight, index) => {
+        const date = dailyStats.time[index];
+        return {height: waveHeight, date};
+    });
+
+    const minSeaSurfaceTemp = hourlyStats.seaSurfaceTemperature.map((temp, index) => {
+        const date = hourlyStats.time[index];
+        return {temp, date};
+    }).sort((a, b) => a.temp - b.temp);
+    const maxSeaSurfaceTemp = hourlyStats.seaSurfaceTemperature.map((temp, index) => {
+        const date = hourlyStats.time[index];
+        return {temp, date};
+    }).sort((a, b) => b.temp - a.temp);
 
     return (
         <div className="max-w-3xl flex flex-col items-center justify-center text-center">
@@ -55,6 +68,44 @@ function RouteComponent() {
                         <div className="py-4">
                             <ForecastTable hourlyData={hourlyData}/>
                         </div>
+                    </AccordionItem>
+                )}
+
+                {statsdata && (
+                    <AccordionItem key="3" aria-label="Stats (last 3 months)" title="Stats (last 3 months)">
+                        <dl className="py-4 flex flex-col gap-2 w-full">
+                            <dt className="font-bold">Highest waves:</dt>
+                            <dd className="mb-2">
+                                <ul>
+                                    {highestWaves.slice(0, 3).map((wave, index) => (
+                                        <li key={index}>
+                                            {wave.height} m on {new Date(wave.date).toLocaleDateString(
+                                            'en-US',
+                                            {month: 'short', day: 'numeric', year: 'numeric'}
+                                        )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </dd>
+
+                            <dt className="font-bold">Lowest sea surface temperature:</dt>
+                            <dd className="mb-2">
+                                {minSeaSurfaceTemp[0].temp} °C
+                                on {new Date(minSeaSurfaceTemp[0].date).toLocaleDateString(
+                                'en-US',
+                                {month: 'short', day: 'numeric', year: 'numeric'}
+                            )}
+                            </dd>
+
+                            <dt className="font-bold">Highest sea surface temperature:</dt>
+                            <dd className="mb-2">
+                                {maxSeaSurfaceTemp[0].temp} °C
+                                on {new Date(maxSeaSurfaceTemp[0].date).toLocaleDateString(
+                                'en-US',
+                                {month: 'short', day: 'numeric', year: 'numeric'}
+                            )}
+                            </dd>
+                        </dl>
                     </AccordionItem>
                 )}
             </Accordion>

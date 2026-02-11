@@ -42,7 +42,7 @@ services:
       test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8080" ]
       interval: 2s
       timeout: 5s
-      retries: 10
+      retries: 30
 
   forecast-stats:
     image: golang:1.25-alpine

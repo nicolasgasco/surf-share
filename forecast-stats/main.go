@@ -15,6 +15,12 @@ func main() {
 		port = "8081"
 	}
 
+	cache, err := internal.NewRedisCache()
+	if err != nil {
+		log.Fatalf("Failed to initialize Redis cache: %v", err)
+	}
+	defer cache.Close()
+
 	tmpl, err := template.ParseFiles("templates/root.html")
 	if err != nil {
 		log.Fatalf("Error parsing template: %v", err)
@@ -39,7 +45,7 @@ func main() {
 		w.Write([]byte("OK"))
 	})
 
-	openMeteoClient := internal.NewOpenMeteoClient()
+	openMeteoClient := internal.NewOpenMeteoClient(cache)
 	breaksClient := internal.NewBreaksClient()
 	statsService := internal.NewStatsService(openMeteoClient, breaksClient)
 	statsHandler := internal.NewHTTPHandler(statsService)

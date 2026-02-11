@@ -12,12 +12,14 @@ import (
 type OpenMeteoClient struct {
 	marineBaseURL string
 	client        *http.Client
+	cache         Cache
 }
 
-func NewOpenMeteoClient() *OpenMeteoClient {
+func NewOpenMeteoClient(cache Cache) *OpenMeteoClient {
 	return &OpenMeteoClient{
 		marineBaseURL: "https://marine-api.open-meteo.com/v1/marine",
 		client:        &http.Client{},
+		cache:         cache,
 	}
 }
 
@@ -64,6 +66,17 @@ func (c *OpenMeteoClient) GetMarineForecast(ctx context.Context, latitude, longi
 	includedParameters := "wave_height,wave_direction,wave_period,sea_level_height_msl,sea_surface_temperature"
 	url := fmt.Sprintf("%s?latitude=%.4f&longitude=%.4f&daily=wave_height_max,wave_direction_dominant,wave_period_max&hourly=%s&timezone=Europe%%2FBerlin&start_date=%s&end_date=%s",
 		c.marineBaseURL, latitude, longitude, includedParameters, oneYearAgo, yesterdayFormatted)
+
+	cacheKey := "openmeteo:" + url
+	if c.cache != nil {
+		var cachedForecast MarineForecast
+		if err := c.cache.Get(ctx, cacheKey, &cachedForecast); err == nil {
+			fmt.Println("Cache hit for Open-Meteo forecast:", cacheKey)
+			return &cachedForecast, nil
+		}
+	}
+
+	fmt.Println("Requesting Open-Meteo Marine Forecast with URL:", url)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -83,6 +96,12 @@ func (c *OpenMeteoClient) GetMarineForecast(ctx context.Context, latitude, longi
 	var forecast MarineForecast
 	if err := json.NewDecoder(resp.Body).Decode(&forecast); err != nil {
 		return nil, err
+	}
+
+	if c.cache != nil {
+		if err := c.cache.Set(ctx, cacheKey, forecast, 12*time.Hour); err != nil {
+			fmt.Printf("Warning: failed to cache forecast: %v\n", err)
+		}
 	}
 
 	return &forecast, nil
